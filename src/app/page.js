@@ -2,15 +2,17 @@
 import { useEffect, useState } from "react";
 import Navbar from "../components/BazarDorNavbar";
 import HeroSection from "../components/HeroSection";
-
-const CATEGORIES_API = "https://openapi.programming-hero.com/api/bazardor/categories";
+import ProductSections from "../components/ProductSections";
+import { CATEGORIES_API, PRODUCTS_API, getCategoryApiUrl } from "../lib/bazardor-api";
 
 export default function App() {
   const [user, setUser] = useState(null);
   const [categories, setCategories] = useState([]);
   const [activeCategory, setActiveCategory] = useState(null);
-  const [categoriesLoading, setCategoriesLoading] = useState(true);
-  const [categoriesError, setCategoriesError] = useState(false);
+  const [activeCategoryInfo, setActiveCategoryInfo] = useState(null);
+  const [products, setProducts] = useState([]);
+  const [productsLoading, setProductsLoading] = useState(true);
+  const [productsError, setProductsError] = useState(false);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -30,19 +32,89 @@ export default function App() {
         }
 
         setCategories(data);
-        setActiveCategory(data[0]?.id ?? null);
       } catch (fetchError) {
         if (fetchError.name !== "AbortError") {
-          setCategoriesError(true);
+          console.error("Failed to load product categories", fetchError);
         }
-      } finally {
-        if (!controller.signal.aborted) setCategoriesLoading(false);
       }
     }
 
     loadCategories();
     return () => controller.abort();
   }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function loadProducts() {
+      try {
+        const response = await fetch(PRODUCTS_API, { signal: controller.signal });
+        if (!response.ok) {
+          throw new Error(`Product request failed (${response.status})`);
+        }
+
+        const data = await response.json();
+        const productList = Array.isArray(data) ? data : data.products ?? data.data;
+        if (!Array.isArray(productList) || !productList.every(
+          (product) => product.id && product.nameBn && product.change
+        )) {
+          throw new Error("The product response has an unexpected format.");
+        }
+
+        setProducts(productList);
+      } catch (fetchError) {
+        if (fetchError.name !== "AbortError") setProductsError(true);
+      } finally {
+        if (!controller.signal.aborted) setProductsLoading(false);
+      }
+    }
+
+    loadProducts();
+    return () => controller.abort();
+  }, []);
+
+  useEffect(() => {
+    if (!activeCategory) return undefined;
+
+    const controller = new AbortController();
+
+    async function loadCategory() {
+      try {
+        const response = await fetch(getCategoryApiUrl(activeCategory), {
+          signal: controller.signal,
+        });
+        if (!response.ok) {
+          throw new Error(`Category detail request failed (${response.status})`);
+        }
+
+        const data = await response.json();
+        const category = data.category ?? data.data ?? data;
+        if (!category.id || !category.nameBn) {
+          throw new Error("The category response has an unexpected format.");
+        }
+
+        setActiveCategoryInfo(category);
+      } catch (fetchError) {
+        if (fetchError.name !== "AbortError") {
+          setActiveCategoryInfo(categories.find((category) => category.id === activeCategory) ?? null);
+        }
+      }
+    }
+
+    loadCategory();
+    return () => controller.abort();
+  }, [activeCategory, categories]);
+
+  function handleCategoryChange(categoryId) {
+    setActiveCategory(categoryId);
+    setActiveCategoryInfo(
+      categories.find((category) => category.id === categoryId) ?? null
+    );
+  }
+
+  const visibleProducts = activeCategory
+    ? products.filter((product) => product.category === activeCategory)
+    : products;
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -53,11 +125,16 @@ export default function App() {
         onSignIn={() => window.alert("Connect your sign-in flow here.")}
         onSignUp={() => window.alert("Connect your sign-up flow here.")}
         onSignOut={() => setUser(null)}
-        onCategoryChange={setActiveCategory}
+        onCategoryChange={handleCategoryChange}
       />
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 sm:px-6 lg:px-8">
         <HeroSection />
-        
+        <ProductSections
+          products={visibleProducts}
+          loading={productsLoading}
+          error={productsError}
+          categoryName={activeCategoryInfo?.nameBn}
+        />
       </main>
     </div>
   );

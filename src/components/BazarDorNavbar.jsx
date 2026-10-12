@@ -67,6 +67,12 @@ export default function BazarDorNavbar({
     setMobileOpen(false);
   }
 
+  function selectAllProducts() {
+    onCategoryChange(null);
+    setMobileOpen(false);
+    document.getElementById("সব-পণ্য")?.scrollIntoView({ behavior: "smooth" });
+  }
+
   return (
     <header className="relative z-40 w-full border-b border-gray-100 bg-white shadow-sm" style={{ fontFamily: '"Hind Siliguri", sans-serif' }}>
       {/* First row: logo + date + authentication */}
@@ -172,6 +178,7 @@ export default function BazarDorNavbar({
         className={`${mobileOpen ? "block" : "hidden"} border-t border-gray-100 sm:block`}
       >
         <div className="mx-auto flex max-w-7xl flex-col gap-1 px-4 py-2 sm:min-h-14 sm:flex-row sm:items-stretch sm:justify-center sm:gap-1 sm:px-6 sm:py-0 lg:px-8">
+          
           {categories.map((category) => {
             const active = activeCategory === category.id;
 
