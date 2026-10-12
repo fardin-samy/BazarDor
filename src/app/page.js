@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from "react";
 import Navbar from "../components/BazarDorNavbar";
+import HeroSection from "../components/HeroSection";
 
 const CATEGORIES_API = "https://openapi.programming-hero.com/api/bazardor/categories";
 
@@ -8,6 +9,8 @@ export default function App() {
   const [user, setUser] = useState(null);
   const [categories, setCategories] = useState([]);
   const [activeCategory, setActiveCategory] = useState(null);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [categoriesError, setCategoriesError] = useState(false);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -30,8 +33,10 @@ export default function App() {
         setActiveCategory(data[0]?.id ?? null);
       } catch (fetchError) {
         if (fetchError.name !== "AbortError") {
-          console.error("Failed to load product categories", fetchError);
+          setCategoriesError(true);
         }
+      } finally {
+        if (!controller.signal.aborted) setCategoriesLoading(false);
       }
     }
 
@@ -50,6 +55,10 @@ export default function App() {
         onSignOut={() => setUser(null)}
         onCategoryChange={setActiveCategory}
       />
+      <main className="mx-auto w-full max-w-7xl flex-1 px-4 sm:px-6 lg:px-8">
+        <HeroSection />
+        
+      </main>
     </div>
   );
 }
