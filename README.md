@@ -35,3 +35,7 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 # BazarDor
+
+## Social authentication
+
+Add `BETTER_AUTH_GOOGLE_CLIENT_ID` and `BETTER_AUTH_GOOGLE_CLIENT_SECRET` from your Google OAuth app to the existing `.env` file. Register `http://localhost:3000/api/auth/callback/google` as an authorized redirect URI in Google Cloud Console, then restart the Next.js dev server. Keep `.env` private and never commit OAuth credentials.

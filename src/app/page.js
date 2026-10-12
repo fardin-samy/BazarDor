@@ -1,11 +1,13 @@
 'use client';
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Navbar from "../components/BazarDorNavbar";
 import HeroSection from "../components/HeroSection";
 import ProductSections from "../components/ProductSections";
 import { CATEGORIES_API, PRODUCTS_API, getCategoryApiUrl } from "../lib/bazardor-api";
 
 export default function App() {
+  const router = useRouter();
   const [user, setUser] = useState(null);
   const [categories, setCategories] = useState([]);
   const [activeCategory, setActiveCategory] = useState(null);
@@ -122,8 +124,8 @@ export default function App() {
         user={user}
         categories={categories}
         activeCategory={activeCategory}
-        onSignIn={() => window.alert("Connect your sign-in flow here.")}
-        onSignUp={() => window.alert("Connect your sign-up flow here.")}
+        onSignIn={() => router.push("/sign-in")}
+        onSignUp={() => router.push("/sign-up")}
         onSignOut={() => setUser(null)}
         onCategoryChange={handleCategoryChange}
       />

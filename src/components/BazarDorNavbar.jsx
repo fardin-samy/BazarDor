@@ -3,6 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { authClient } from "../lib/auth-client";
+import { useToast } from "./ToastProvider";
 
 // Sample prices for the ticker; the categories endpoint does not provide prices.
 const SAMPLE_PRICES = [
@@ -42,6 +44,9 @@ export default function BazarDorNavbar({
   prices = SAMPLE_PRICES,
 }) {
   const router = useRouter();
+  const { data: session } = authClient.useSession();
+  const currentUser = session?.user ?? user;
+  const toast = useToast();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [date, setDate] = useState("");
@@ -75,6 +80,22 @@ export default function BazarDorNavbar({
     document.getElementById("সব-পণ্য")?.scrollIntoView({ behavior: "smooth" });
   }
 
+  async function handleSignOut() {
+    try {
+      const { error } = await authClient.signOut();
+      if (error) {
+        toast.error(error.message || "সাইন আউট করা যায়নি। আবার চেষ্টা করুন।");
+        return;
+      }
+
+      onSignOut();
+      setProfileOpen(false);
+      toast.success("সাইন আউট সফল হয়েছে।");
+    } catch {
+      toast.error("সাইন আউট করা যায়নি। আবার চেষ্টা করুন।");
+    }
+  }
+
   return (
     <header className="relative z-40 w-full border-b border-gray-100 bg-white shadow-sm" style={{ fontFamily: '"Hind Siliguri", sans-serif' }}>
       {/* First row: logo + date + authentication */}
@@ -96,7 +117,7 @@ export default function BazarDorNavbar({
 
         {/* Desktop authentication */}
         <div className="hidden items-center gap-3 sm:flex">
-          {user ? (
+          {currentUser ? (
             <div className="relative">
               <button
                 type="button"
@@ -104,9 +125,9 @@ export default function BazarDorNavbar({
                 aria-expanded={profileOpen}
                 className="flex items-center gap-2 rounded-xl border border-gray-200 px-3 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
               >
-                {user.avatarUrl ? (
+                {currentUser.image || currentUser.avatarUrl ? (
                   <Image
-                    src={user.avatarUrl}
+                    src={currentUser.image || currentUser.avatarUrl}
                     alt=""
                     width={32}
                     height={32}
@@ -115,25 +136,25 @@ export default function BazarDorNavbar({
                   />
                 ) : (
                   <span className="grid size-8 place-items-center rounded-full bg-green-100 text-green-800">
-                    {(user.name || "ব").slice(0, 1)}
+                    {(currentUser.name || "ব").slice(0, 1)}
                   </span>
                 )}
-                <span className="max-w-32 truncate">{user.name || "আমার অ্যাকাউন্ট"}</span>
+                <span className="max-w-32 truncate">{currentUser.name || "আমার অ্যাকাউন্ট"}</span>
                 <span>⌄</span>
               </button>
 
               {profileOpen && (
                 <div className="absolute right-0 top-full z-50 mt-2 w-52 rounded-xl border border-gray-100 bg-white p-2 shadow-xl">
-                  {user.email && (
+                  {currentUser.email && (
                     <p className="break-all px-3 py-2 text-xs text-gray-500">
-                      {user.email}
+                      {currentUser.email}
                     </p>
                   )}
                   <button
                     type="button"
                     onClick={() => {
                       setProfileOpen(false);
-                      onSignOut();
+                      handleSignOut();
                     }}
                     className="w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-red-600 hover:bg-red-50"
                   >
@@ -207,13 +228,13 @@ export default function BazarDorNavbar({
 
           {/* Mobile authentication */}
           <div className="flex gap-2 border-t border-gray-100 pt-3 sm:hidden">
-            {user ? (
+            {currentUser ? (
               <>
                 <span className="flex flex-1 items-center text-sm text-gray-600">
-                  👤 {user.name}
+                  👤 {currentUser.name}
                 </span>
                 <button
-                  onClick={onSignOut}
+                  onClick={handleSignOut}
                   className="rounded-lg border border-green-700 px-4 py-2 text-sm font-semibold text-green-800"
                 >
                   সাইন আউট
