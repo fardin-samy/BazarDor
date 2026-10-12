@@ -10,3 +10,7 @@ export function getProductApiUrl(id) {
 export function getCategoryApiUrl(slug) {
   return `${CATEGORIES_API}/${encodeURIComponent(slug)}`;
 }
+
+export function getCategoryProductsApiUrl(slug) {
+  return `${PRODUCTS_API}?category=${encodeURIComponent(slug)}`;
+}

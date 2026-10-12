@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 // Sample prices for the ticker; the categories endpoint does not provide prices.
@@ -40,6 +41,7 @@ export default function BazarDorNavbar({
   onCategoryChange = () => {},
   prices = SAMPLE_PRICES,
 }) {
+  const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [date, setDate] = useState("");
@@ -63,12 +65,8 @@ export default function BazarDorNavbar({
   }, []);
 
   function selectCategory(category) {
-    onCategoryChange(category.id);
     setMobileOpen(false);
-    document.getElementById("আজ-দাম-বেড়েছে")?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
+    router.push(`/category/${category.slug}`);
   }
 
   function selectAllProducts() {
