@@ -59,7 +59,7 @@ export function ProductChangeBadge({ change }) {
 export default function ProductCard({ product }) {
   return (
     <Link
-      href={`/product/${product.id}`}
+      href={`/product/${product.slug}`}
       className="group flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-1 hover:border-emerald-300 hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 sm:p-5"
       aria-label={`${product.nameBn}, ${formatBanglaNumber(product.today)} টাকা, পণ্যের বিস্তারিত দেখুন`}
     >

@@ -1,4 +1,4 @@
-import ProductCard from "./ProductCard";
+import ProductCard, { formatBanglaNumber } from "./ProductCard";
 
 function ProductGrid({ products, emptyMessage }) {
   if (products.length === 0) {
@@ -26,7 +26,11 @@ function MoverSection({ title, direction, products, loading }) {
     .slice(0, 6);
 
   return (
-    <section aria-labelledby={`${direction}-heading`} className="mt-12 sm:mt-16">
+    <section
+      id={isUp ? "আজ-দাম-বেড়েছে" : undefined}
+      aria-labelledby={`${direction}-heading`}
+      className="mt-12 scroll-mt-6 sm:mt-16"
+    >
       <div className="mb-5 flex items-center gap-3">
         <span className={`grid size-10 place-items-center rounded-xl text-lg ${!isUp ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"}`} aria-hidden="true">
           {isUp ? "▲" : "▼"}
@@ -68,7 +72,7 @@ export default function ProductSections({
           </div>
           {!loading && !error && (
             <span className="rounded-full bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-800">
-              {products.length}টি পণ্য
+              {formatBanglaNumber(products.length)}টি পণ্য
             </span>
           )}
         </div>

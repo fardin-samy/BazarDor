@@ -65,6 +65,10 @@ export default function BazarDorNavbar({
   function selectCategory(category) {
     onCategoryChange(category.id);
     setMobileOpen(false);
+    document.getElementById("আজ-দাম-বেড়েছে")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
   }
 
   function selectAllProducts() {
