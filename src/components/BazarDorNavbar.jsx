@@ -186,7 +186,7 @@ export default function BazarDorNavbar({
         {/* Mobile menu toggle */}
         <button
           type="button"
-          aria-label="মেনু খুলুন"
+          aria-label={mobileOpen ? "মেনু বন্ধ করুন" : "মেনু খুলুন"}
           aria-expanded={mobileOpen}
           onClick={() => setMobileOpen(!mobileOpen)}
           className="grid size-10 shrink-0 place-items-center rounded-lg border border-green-100 text-xl text-green-800 sm:hidden"
@@ -200,7 +200,7 @@ export default function BazarDorNavbar({
         aria-label="পণ্যের বিভাগ"
         className={`${mobileOpen ? "block" : "hidden"} border-t border-gray-100 sm:block`}
       >
-        <div className="mx-auto flex max-w-7xl flex-col gap-1 px-4 py-2 sm:min-h-14 sm:flex-row sm:items-stretch sm:justify-center sm:gap-1 sm:px-6 sm:py-0 lg:px-8">
+        <div className="mx-auto flex max-w-7xl flex-col gap-1 px-4 py-2 sm:min-h-14 sm:flex-row sm:flex-wrap sm:items-stretch sm:justify-center sm:gap-1 sm:px-6 sm:py-0 lg:px-8">
           
           {categories.map((category) => {
             const active = activeCategory === category.id;
