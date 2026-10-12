@@ -1,18 +1,34 @@
 import { Suspense } from "react";
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import ProductDetailClient from "./ProductDetailClient";
 import { auth } from "../../../lib/auth";
+import { PRODUCTS_API } from "../../../lib/bazardor-api";
 
 async function ProtectedProductDetail({ params }) {
   const { slug } = await params;
+  const productsResponse = await fetch(PRODUCTS_API, { cache: "no-store" });
+  if (!productsResponse.ok) {
+    throw new Error(`Product request failed (${productsResponse.status})`);
+  }
+
+  const responseData = await productsResponse.json();
+  const products = Array.isArray(responseData)
+    ? responseData
+    : responseData.products ?? responseData.data;
+  const product = products?.find((item) => item.slug === slug);
+
+  if (!product) {
+    notFound();
+  }
+
   const session = await auth.api.getSession({ headers: await headers() });
 
   if (!session) {
-    redirect(`/sign-in?callbackURL=${encodeURIComponent(`/product/${slug}`)}`);
+    redirect(`/sign-in?reason=auth_required&callbackURL=${encodeURIComponent(`/product/${slug}`)}`);
   }
 
-  return <ProductDetailClient slug={slug} />;
+  return <ProductDetailClient productId={product.id} />;
 }
 
 export default function ProductDetailPage({ params }) {

@@ -1,4 +1,15 @@
 import ProductCard, { formatBanglaNumber } from "./ProductCard";
+import ProductCardSkeleton from "./ProductCardSkeleton";
+
+function ProductGridSkeleton({ count = 4 }) {
+  return (
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" aria-hidden="true">
+      {Array.from({ length: count }, (_, index) => (
+        <ProductCardSkeleton key={index} />
+      ))}
+    </div>
+  );
+}
 
 function ProductGrid({ products, emptyMessage }) {
   if (products.length === 0) {
@@ -40,7 +51,9 @@ function MoverSection({ title, direction, products, loading }) {
         </h2>
       </div>
       {loading ? (
-        <p role="status" className="rounded-2xl border border-slate-200 bg-white p-6 text-slate-500">দামের তথ্য লোড হচ্ছে…</p>
+        <div role="status" aria-label="দামের তথ্য লোড হচ্ছে">
+          <ProductGridSkeleton count={6} />
+        </div>
       ) : (
         <ProductGrid products={movers} emptyMessage="এই মুহূর্তে কোনো দামের পরিবর্তন নেই।" />
       )}
@@ -78,7 +91,9 @@ export default function ProductSections({
         </div>
 
         {loading ? (
-          <p role="status" className="rounded-2xl border border-slate-200 bg-white p-6 text-slate-500">সব পণ্য লোড হচ্ছে…</p>
+          <div role="status" aria-label="সব পণ্য লোড হচ্ছে">
+            <ProductGridSkeleton count={8} />
+          </div>
         ) : error ? (
           <p role="alert" className="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-800">
             পণ্যের তথ্য আনা যায়নি। অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন।

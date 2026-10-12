@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ProductChangeBadge, formatBanglaNumber, getUnitLabel } from "../../../components/ProductCard";
-import { PRODUCTS_API, getProductApiUrl } from "../../../lib/bazardor-api";
+import { getProductApiUrl } from "../../../lib/bazardor-api";
 
-export default function ProductDetailClient({ slug }) {
+export default function ProductDetailClient({ productId }) {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -18,23 +18,7 @@ export default function ProductDetailClient({ slug }) {
       setError(false);
 
       try {
-        const listResponse = await fetch(PRODUCTS_API, { signal: controller.signal });
-        if (!listResponse.ok) {
-          throw new Error(`Product list request failed (${listResponse.status})`);
-        }
-
-        const listData = await listResponse.json();
-        const products = Array.isArray(listData)
-          ? listData
-          : listData.products ?? listData.data;
-        const match = products?.find((item) => item.slug === slug);
-
-        if (!match) {
-          setError(true);
-          return;
-        }
-
-        const detailResponse = await fetch(getProductApiUrl(match.id), {
+        const detailResponse = await fetch(getProductApiUrl(productId), {
           signal: controller.signal,
         });
         if (!detailResponse.ok) {
@@ -57,7 +41,7 @@ export default function ProductDetailClient({ slug }) {
 
     loadProduct();
     return () => controller.abort();
-  }, [slug]);
+  }, [productId]);
 
   const markets = product?.markets ?? [];
   const marketMidpoints = markets.map((market) => (Number(market.min) + Number(market.max)) / 2);

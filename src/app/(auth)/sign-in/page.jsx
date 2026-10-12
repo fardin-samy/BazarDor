@@ -27,12 +27,26 @@ export default function SignInPage() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    if (!params.has("error")) return;
+    const hasOAuthError = params.has("error");
+    const wasRedirectedForProduct = params.get("reason") === "auth_required";
+    if (!hasOAuthError && !wasRedirectedForProduct) return;
 
-    window.sessionStorage.removeItem("bazarDor:auth-success-toast");
-    window.history.replaceState({}, "", "/sign-in");
+    if (hasOAuthError) {
+      window.sessionStorage.removeItem("bazarDor:auth-success-toast");
+    }
+    params.delete("error");
+    params.delete("error_description");
+    params.delete("reason");
+    const remainingQuery = params.toString();
+    window.history.replaceState({}, "", `/sign-in${remainingQuery ? `?${remainingQuery}` : ""}`);
     const timeoutId = window.setTimeout(
-      () => toast.error("সামাজিক অ্যাকাউন্ট দিয়ে সাইন ইন করা যায়নি। OAuth সেটিংস যাচাই করুন।"),
+      () => {
+        if (hasOAuthError) {
+          toast.error("সামাজিক অ্যাকাউন্ট দিয়ে সাইন ইন করা যায়নি। OAuth সেটিংস যাচাই করুন।");
+        } else {
+          toast.info("পণ্যের বিস্তারিত দেখতে সাইন ইন করুন। সাইন ইন হলে আগের পণ্যেই ফিরবেন।");
+        }
+      },
       0
     );
     return () => window.clearTimeout(timeoutId);

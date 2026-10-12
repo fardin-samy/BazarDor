@@ -150,6 +150,13 @@ export default function BazarDorNavbar({
                       {currentUser.email}
                     </p>
                   )}
+                  <Link
+                    href="/profile"
+                    onClick={() => setProfileOpen(false)}
+                    className="block w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800"
+                  >
+                    আমার প্রোফাইল
+                  </Link>
                   <button
                     type="button"
                     onClick={() => {
@@ -230,12 +237,18 @@ export default function BazarDorNavbar({
           <div className="flex gap-2 border-t border-gray-100 pt-3 sm:hidden">
             {currentUser ? (
               <>
-                <span className="flex flex-1 items-center text-sm text-gray-600">
+                <span className="flex min-w-0 flex-1 items-center truncate text-sm text-gray-600">
                   👤 {currentUser.name}
                 </span>
+                <Link
+                  href="/profile"
+                  className="shrink-0 rounded-lg px-3 py-2 text-sm font-semibold text-emerald-800 hover:bg-emerald-50"
+                >
+                  প্রোফাইল
+                </Link>
                 <button
                   onClick={handleSignOut}
-                  className="rounded-lg border border-green-700 px-4 py-2 text-sm font-semibold text-green-800"
+                  className="shrink-0 rounded-lg border border-green-700 px-3 py-2 text-sm font-semibold text-green-800"
                 >
                   সাইন আউট
                 </button>
