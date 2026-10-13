@@ -24,8 +24,11 @@ export default function SignUpPage() {
     window.sessionStorage.removeItem("bazarDor:auth-success-toast");
     window.history.replaceState({}, "", "/sign-up");
     const timeoutId = window.setTimeout(
-      () => toast.error("সামাজিক অ্যাকাউন্ট দিয়ে নিবন্ধন করা যায়নি। OAuth সেটিংস যাচাই করুন।"),
-      0
+      () =>
+        toast.error(
+          "সামাজিক অ্যাকাউন্ট দিয়ে নিবন্ধন করা যায়নি। OAuth সেটিংস যাচাই করুন।",
+        ),
+      0,
     );
     return () => window.clearTimeout(timeoutId);
   }, [toast]);
@@ -58,7 +61,13 @@ export default function SignUpPage() {
       });
 
       if (signUpError) {
-        const message = signUpError.message || "অ্যাকাউন্ট তৈরি করা যায়নি। আবার চেষ্টা করুন।";
+        console.log("Better Auth signup error:", signUpError);
+
+        const message =
+          signUpError.message ||
+          signUpError.statusText ||
+          `অ্যাকাউন্ট তৈরি ব্যর্থ হয়েছে (HTTP ${signUpError.status || "unknown"}).`;
+
         setError(message);
         toast.error(message);
         return;
@@ -67,8 +76,15 @@ export default function SignUpPage() {
       toast.success("নিবন্ধন সফল হয়েছে। এখন সাইন ইন করুন।");
       router.replace("/sign-in");
       router.refresh();
-    } catch {
-      const message = "সার্ভারের সঙ্গে সংযোগ করা যায়নি। কিছুক্ষণ পর আবার চেষ্টা করুন।";
+    } catch (err) {
+      console.error("Signup request threw an exception:", err);
+      console.error("Error message:", err?.message);
+      console.error("Error stack:", err?.stack);
+
+      const message =
+        err?.message ||
+        "সার্ভারের সঙ্গে সংযোগ করা যায়নি। কিছুক্ষণ পর আবার চেষ্টা করুন।";
+
       setError(message);
       toast.error(message);
     } finally {
@@ -78,41 +94,73 @@ export default function SignUpPage() {
 
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-50 px-4 py-10 sm:px-6">
-      <div aria-hidden="true" className="pointer-events-none absolute -left-32 -top-28 size-80 rounded-full bg-emerald-100/70 blur-3xl" />
-      <div aria-hidden="true" className="pointer-events-none absolute -bottom-40 -right-24 size-96 rounded-full bg-amber-100/60 blur-3xl" />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -left-32 -top-28 size-80 rounded-full bg-emerald-100/70 blur-3xl"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -bottom-40 -right-24 size-96 rounded-full bg-amber-100/60 blur-3xl"
+      />
 
       <div className="relative grid w-full max-w-5xl overflow-hidden rounded-4xl border border-white bg-white shadow-xl shadow-slate-900/5 lg:grid-cols-[0.9fr_1.1fr]">
         <aside className="relative hidden flex-col justify-between overflow-hidden bg-emerald-800 p-10 text-white lg:flex">
-          <div aria-hidden="true" className="absolute -right-20 top-28 size-72 rounded-full border-36 border-white/5" />
-          <div aria-hidden="true" className="absolute -bottom-24 -left-24 size-80 rounded-full bg-emerald-700" />
+          <div
+            aria-hidden="true"
+            className="absolute -right-20 top-28 size-72 rounded-full border-36 border-white/5"
+          />
+          <div
+            aria-hidden="true"
+            className="absolute -bottom-24 -left-24 size-80 rounded-full bg-emerald-700"
+          />
 
-          <Link href="/" className="relative z-10 inline-flex items-center gap-3 text-xl font-bold">
-            <span className="grid size-11 place-items-center rounded-2xl bg-white/10 text-2xl">🛒</span>
+          <Link
+            href="/"
+            className="relative z-10 inline-flex items-center gap-3 text-xl font-bold"
+          >
+            <span className="grid size-11 place-items-center rounded-2xl bg-white/10 text-2xl">
+              🛒
+            </span>
             বাজার দর
           </Link>
 
           <div className="relative z-10 py-10">
-            <p className="text-sm font-semibold tracking-wide text-emerald-200">আপনার বাজার, আপনার হাতে</p>
+            <p className="text-sm font-semibold tracking-wide text-emerald-200">
+              আপনার বাজার, আপনার হাতে
+            </p>
             <h1 className="mt-4 text-4xl font-extrabold leading-tight">
-              বাজারদরের<br />সহজ ঠিকানা
+              বাজারদরের
+              <br />
+              সহজ ঠিকানা
             </h1>
             <p className="mt-5 max-w-xs leading-7 text-emerald-100">
               অ্যাকাউন্ট তৈরি করে পণ্যের দর ও বাজারের হালনাগাদ তথ্য সহজে দেখুন।
             </p>
           </div>
 
-          <p className="relative z-10 text-xs text-emerald-200">সতেজ • সাশ্রয়ী • সহজ</p>
+          <p className="relative z-10 text-xs text-emerald-200">
+            সতেজ • সাশ্রয়ী • সহজ
+          </p>
         </aside>
 
         <section className="px-6 py-9 sm:px-12 sm:py-12">
-          <Link href="/" className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 transition hover:text-emerald-700">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 transition hover:text-emerald-700"
+          >
             <span aria-hidden="true">←</span> হোম পেজে ফিরুন
           </Link>
 
           <header className="mt-8">
-            <p className="text-sm font-bold text-emerald-700">নতুন অ্যাকাউন্ট</p>
-            <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-slate-900">নিবন্ধন করুন</h2>
-            <p className="mt-2 text-slate-500">আপনার তথ্য দিয়ে বাজার দর-এ যোগ দিন।</p>
+            <p className="text-sm font-bold text-emerald-700">
+              নতুন অ্যাকাউন্ট
+            </p>
+            <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-slate-900">
+              নিবন্ধন করুন
+            </h2>
+            <p className="mt-2 text-slate-500">
+              আপনার তথ্য দিয়ে বাজার দর-এ যোগ দিন।
+            </p>
           </header>
 
           <form className="mt-7 space-y-4" onSubmit={handleSubmit}>
@@ -171,7 +219,10 @@ export default function SignUpPage() {
             </label>
 
             {error && (
-              <p role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              <p
+                role="alert"
+                className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+              >
                 {error}
               </p>
             )}
@@ -185,11 +236,17 @@ export default function SignUpPage() {
             </button>
           </form>
 
-          <SocialAuthButtons disabled={isSubmitting} errorCallbackURL="/sign-up" />
+          <SocialAuthButtons
+            disabled={isSubmitting}
+            errorCallbackURL="/sign-up"
+          />
 
           <p className="mt-7 text-center text-sm text-slate-600">
             আগে থেকেই অ্যাকাউন্ট আছে?{" "}
-            <Link href="/sign-in" className="font-bold text-emerald-700 hover:text-emerald-800">
+            <Link
+              href="/sign-in"
+              className="font-bold text-emerald-700 hover:text-emerald-800"
+            >
               সাইন ইন করুন
             </Link>
           </p>
